@@ -1,46 +1,92 @@
-name: Start a new radar edition
+name: Propose a technology
+description: Suggest a new blip for the technology radar, a change to an existing one, or retiring one.
+title: "[Radar] "
+labels: ["proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a technology. A radar maintainer will review it, and once it is approved the radar updates automatically.
 
-# Run from the Actions tab. Resets every blip to "No change" so only the next round of
-# proposals shows as New or Moved, and sets the edition name shown in the radar header.
-on:
-  workflow_dispatch:
-    inputs:
-      edition:
-        description: Edition name, for example "May 2027"
-        required: true
+        **Changing an existing blip?** Use its exact name. The fields you fill in replace the current ones; empty optional fields keep their current values.
 
-concurrency:
-  group: radar-data
-  cancel-in-progress: false
+        **Bringing back a retired blip?** Choose "Add or update" and use its exact name. Its history is kept.
 
-jobs:
-  reset:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-      - name: Reset statuses
-        env:
-          EDITION: ${{ inputs.edition }}
-        run: node scripts/radar.mjs new-edition "$EDITION"
-      - name: Commit
-        env:
-          EDITION: ${{ inputs.edition }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/data notes
-          git commit -m "Radar: start edition $EDITION"
-          git push
+        **Retiring a blip?** Choose "Retire", give its exact name and a reason. You can skip the other fields.
 
-  deploy:
-    needs: reset
-    uses: ./.github/workflows/deploy.yml
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
+  - type: dropdown
+    id: action
+    attributes:
+      label: What should happen?
+      options:
+        - Add or update
+        - Retire
+      default: 0
+    validations:
+      required: true
+
+  - type: input
+    id: name
+    attributes:
+      label: Technology name
+      placeholder: e.g. AgentsView
+    validations:
+      required: true
+
+  - type: dropdown
+    id: quadrant
+    attributes:
+      label: Quadrant
+      description: Required when adding or updating.
+      # Keep these in step with site/config.json
+      options:
+        - Enabling
+        - Design
+        - Construction
+        - Commissioning & Handover
+
+  - type: dropdown
+    id: ring
+    attributes:
+      label: Ring
+      description: "Required when adding or updating. Adopt: use it by default. Trial: use where you can take some risk. Assess: explore it. Caution: avoid for new work."
+      # Keep these in step with site/config.json
+      options:
+        - Adopt
+        - Trial
+        - Assess
+        - Caution
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Required when adding or updating. What it is, why it matters, and why this ring. You can use **bold**, bullet lists and [links](https://example.com).
+
+  - type: textarea
+    id: related
+    attributes:
+      label: Related blips
+      description: Names of other blips on the radar, one per line or separated by commas.
+      placeholder: |
+        Claude Code
+        OpenAI Codex
+
+  - type: input
+    id: engage
+    attributes:
+      label: Viva Engage link
+      description: Link to the community or conversation where people can discuss this technology.
+      placeholder: https://engage.cloud.microsoft/...
+
+  - type: textarea
+    id: banner
+    attributes:
+      label: Banner image
+      description: Drag an image into this box, or paste a link to one. Wide images (about 3:1) look best.
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason for this change
+      description: Optional, but recommended when retiring. Saved to the public decision log (notes/decisions.md). For retired blips it is also shown on the radar's Archive tab.
