@@ -1,14 +1,12 @@
 name: Add blip from approved proposal
 
 # Runs when a maintainer adds the "approved" label to a proposal issue.
+# Several approvals can run at the same time: each one saves its change on top of the
+# latest data (retrying if another approval saved first), then asks for a publish.
+# Publishing is queued, so approving many proposals in a row publishes only once or twice.
 on:
   issues:
     types: [labeled]
-
-# One radar update at a time, so two approvals never overwrite each other.
-concurrency:
-  group: radar-data
-  cancel-in-progress: false
 
 jobs:
   add-blip:
@@ -17,8 +15,7 @@ jobs:
     permissions:
       contents: write
       issues: write
-    outputs:
-      ok: ${{ steps.apply.outputs.ok }}
+      actions: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -28,28 +25,44 @@ jobs:
         with:
           node-version: 24
 
-      - name: Update radar data from the issue
+      - name: Update radar data and save it
         id: apply
-        run: node scripts/radar.mjs add-from-issue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit the change
-        if: steps.apply.outputs.ok == 'true'
-        env:
-          BLIP_NAME: ${{ steps.apply.outputs.name }}
           ISSUE: ${{ github.event.issue.number }}
+          BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/data site/images notes
-          if git diff --cached --quiet; then
-            echo "Nothing changed."
-          else
-            git commit -m "Radar: $BLIP_NAME (#$ISSUE)"
-            git pull --rebase
-            git push
+          RESULT="$RUNNER_TEMP/radar-result.txt"
+          value() { grep -A1 "^$1<<" "$RESULT" | tail -n1; }
+          SAVED=""
+          for attempt in 1 2 3 4 5 6; do
+            # Start from the latest saved data every time.
+            git fetch --quiet origin "$BRANCH"
+            git reset --quiet --hard "origin/$BRANCH"
+            : > "$RESULT"
+            GITHUB_OUTPUT="$RESULT" node scripts/radar.mjs add-from-issue
+            [ "$(value ok)" = "true" ] || break          # a problem with the proposal: report it, nothing to save
+            git add site/data site/images notes
+            if git diff --cached --quiet; then SAVED=yes; break; fi
+            git commit --quiet -m "Radar: $(value name) (#$ISSUE)"
+            if git push --quiet origin "HEAD:$BRANCH"; then SAVED=yes; break; fi
+            echo "Another change was saved at the same moment; trying again ($attempt)..."
+            sleep $(( attempt * 4 ))
+          done
+          cat "$RESULT" >> "$GITHUB_OUTPUT"
+          if [ "$(value ok)" = "true" ] && [ -z "$SAVED" ]; then
+            echo "Could not save the change after several attempts." >&2
+            exit 1
           fi
+
+      - name: Request a publish
+        if: steps.apply.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.event.repository.default_branch }}
+        run: gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
 
       - name: Report success on the issue
         if: steps.apply.outputs.ok == 'true'
@@ -67,20 +80,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE: ${{ github.event.issue.number }}
           MESSAGE: ${{ steps.apply.outputs.message }}
+          OK: ${{ steps.apply.outputs.ok }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          if [ -z "$MESSAGE" ]; then
+          if [ "$OK" = "true" ] || [ -z "$MESSAGE" ]; then
             MESSAGE="Something went wrong while adding this to the radar. The details are in the workflow run: $RUN_URL"
           fi
           gh issue comment "$ISSUE" --repo "$GITHUB_REPOSITORY" --body "$MESSAGE"
           gh issue edit "$ISSUE" --repo "$GITHUB_REPOSITORY" --remove-label approved || true
-
-  # Pushes made by the workflow's own token don't trigger other workflows, so publish explicitly.
-  deploy:
-    needs: add-blip
-    if: needs.add-blip.outputs.ok == 'true'
-    uses: ./.github/workflows/deploy.yml
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
