@@ -1,0 +1,54 @@
+name: Deploy radar to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['site/**']
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Always publish the latest commit, including one made earlier in the same run.
+          ref: ${{ github.event.repository.default_branch }}
+
+      # Give the page's script and PDF links a new version on every publish, so browsers
+      # never mix freshly published files with copies cached from the previous publish.
+      - name: Stamp file versions
+        run: |
+          V="$(git rev-parse --short HEAD)-${GITHUB_RUN_NUMBER}"
+          sed -i "s/?v=dev/?v=${V}/g" site/index.html site/report.html
+          echo "Version ${V}"
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      # Lays out site/report.html with the runner's preinstalled Chrome and saves site/technology-radar.pdf
+      - name: Build the PDF report
+        run: node scripts/build-pdf.mjs
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+      - id: deployment
+        uses: actions/deploy-pages@v5
