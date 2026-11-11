@@ -1,0 +1,62 @@
+{
+  "title": "Technology Radar",
+  "organisation": "Mott MacDonald Bentley",
+  "logo": "images/logo-placeholder.svg",
+  "logoLink": "",
+  "theme": {
+    "primary": "#16384c",
+    "highlight": "#16384c",
+    "ink": "#1d2433",
+    "muted": "#5b6475",
+    "panel": "#eef1f5"
+  },
+  "repo": "maciejsulek/mm-tech-radar",
+  "siteUrl": "https://maciejsulek.github.io/mm-tech-radar/",
+  "quadrants": [
+    {
+      "name": "Enabling",
+      "position": "top-left",
+      "color": "#1f7a8c",
+      "description": "The shared foundations every stage relies on: data platforms, common data environments, standards, collaboration tools, AI and automation."
+    },
+    {
+      "name": "Design",
+      "position": "top-right",
+      "color": "#b7791f",
+      "description": "How we create, analyse and coordinate designs: modelling and analysis tools, computational and generative design, clash detection and design for manufacture and assembly."
+    },
+    {
+      "name": "Construction",
+      "position": "bottom-right",
+      "color": "#4f7d3a",
+      "description": "How we build on site and off site: construction methods, materials, site equipment, offsite and modular manufacture, and monitoring of progress, quality and safety."
+    },
+    {
+      "name": "Commissioning & Handover",
+      "position": "bottom-left",
+      "color": "#a23b4f",
+      "description": "Bringing assets into use and passing them to the client: testing and commissioning, asset information, digital handover, operations and maintenance data, and soft landings."
+    }
+  ],
+  "rings": [
+    {
+      "name": "Adopt",
+      "description": "We use this with confidence and recommend it as the default choice."
+    },
+    {
+      "name": "Trial",
+      "description": "Worth pursuing on a project that can handle some risk. We have seen it work."
+    },
+    {
+      "name": "Assess",
+      "description": "Worth exploring to understand how it could affect us. Not yet for production."
+    },
+    {
+      "name": "Caution",
+      "description": "Proceed carefully. We advise against starting new work with this."
+    }
+  ],
+  "report": {
+    "showRetired": true
+  }
+}

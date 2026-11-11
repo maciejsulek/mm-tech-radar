@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technology Radar</title>
+<style>
+  :root {
+    --ink: #1d2433;
+    --muted: #5b6475;
+    --line: #d5dae3;
+    --panel: #eef1f5;
+    --accent: #16384c;
+    --link: #0b5cad;
+    --font: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; font-family: var(--font); color: var(--ink); background: #fff; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+           padding: 14px 24px; border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 22px; margin: 0; }
+  header .edition { color: var(--muted); font-size: 14px; font-weight: 400; margin-left: 10px; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand a, .brand img { display: block; }
+  .brand img { height: 36px; width: auto; max-width: 180px; object-fit: contain; }
+  .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  input[type=search] { font: inherit; font-size: 14px; padding: 7px 10px; border: 1px solid var(--line);
+                       border-radius: 4px; width: 220px; }
+  .btn { background: var(--accent); color: var(--on-accent, #fff); text-decoration: none; padding: 8px 14px; border-radius: 4px;
+         font-weight: 600; font-size: 14px; white-space: nowrap; border: 1px solid var(--accent); cursor: pointer;
+         font-family: inherit; line-height: 1.2; }
+  .btn:hover { filter: brightness(.88); }
+  .btn-secondary { background: #fff; color: var(--accent); }
+  .btn-secondary:hover { background: var(--panel); filter: none; }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 28px; padding: 20px 24px 40px;
+            max-width: 1360px; margin: 0 auto; }
+  @media (max-width: 1020px) { .layout { grid-template-columns: 1fr; } }
+
+  .radar-wrap { position: relative; }
+  #radar svg { width: 100%; max-width: 820px; height: auto; display: block; margin: 0 auto; }
+  .blip { cursor: pointer; transition: opacity .15s; }
+  .blip:focus { outline: none; }
+  .blip:hover .dot { filter: brightness(1.15); }
+  .blip:focus-visible .dot, .blip.selected .dot { stroke: #111827; stroke-width: 3; }
+  .blip.dim, .list li.dim { opacity: .15; }
+  .tip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; font-size: 13px;
+         padding: 4px 8px; border-radius: 4px; white-space: nowrap; transform: translate(-50%, calc(-100% - 12px));
+         display: none; z-index: 5; }
+  .legend { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: var(--muted);
+            margin: 12px 0 0; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .legend svg { flex: none; }
+
+  aside.detail { align-self: start; position: sticky; top: 16px; border: 1px solid var(--line); background: #fff; }
+  .detail .empty { padding: 24px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+  .detail .head { background: var(--accent); color: var(--on-accent, #fff); padding: 14px 18px; font-size: 19px; font-weight: 700;
+                  display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .detail .close { background: none; border: 0; color: inherit; font-size: 24px; line-height: 1; cursor: pointer; padding: 0 2px; }
+  .banner { display: block; width: 100%; aspect-ratio: 3 / 1; object-fit: cover; background: var(--panel); }
+  /* No banner image: a thin strip in the quadrant colour instead of a large block. */
+  .banner-fallback { aspect-ratio: auto; height: 6px; padding: 0; font-size: 0; overflow: hidden; }
+  .acc .banner-fallback { display: none; }
+  .detail .body { padding: 16px 18px 20px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .chip { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--panel); }
+  .chip[title] { cursor: help; }
+  .desc { font-size: 15px; line-height: 1.55; }
+  .desc p { margin: 0 0 10px; }
+  .desc ul { margin: 0 0 10px; padding-left: 20px; }
+  .desc a, .detail a.link { color: var(--link); }
+  .engage { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0; color: var(--link); font-weight: 600;
+            text-decoration: none; font-size: 14px; }
+  .engage:hover { text-decoration: underline; }
+  .detail h3 { font-size: 15px; margin: 18px 0 8px; }
+  .tiles { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tile { border: 1px solid var(--accent); background: #fff; padding: 6px 10px; text-align: left; font: inherit;
+          cursor: pointer; min-width: 96px; color: var(--ink); }
+  .tile:hover { background: var(--panel); }
+  .tile b { display: block; font-size: 14px; }
+  .tile small { font-size: 12px; color: var(--muted); }
+  .tile.missing { border-style: dashed; cursor: default; opacity: .7; }
+  .tile.missing:hover { background: #fff; }
+  .history { font-size: 13px; color: var(--muted); padding-left: 18px; margin: 0; line-height: 1.6; }
+  .detail summary { cursor: pointer; font-weight: 600; font-size: 14px; margin-top: 16px; }
+
+  .list { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px;
+          border-top: 1px solid var(--line); padding-top: 20px; }
+  .list h2 { font-size: 16px; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; }
+  .list h2 i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .list h4 { margin: 12px 0 2px; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .list ul { list-style: none; margin: 0; padding: 0; }
+  .list li button { background: none; border: 0; padding: 3px 0; font: inherit; font-size: 14px; cursor: pointer;
+                    color: var(--ink); text-align: left; }
+  .list li button:hover { text-decoration: underline; }
+  .list li.active button { font-weight: 700; }
+  .rings-key { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px;
+               font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .rings-key b { color: var(--ink); display: block; }
+  .problem { margin: 16px 24px 0; padding: 12px 16px; border: 1px solid #e0b4b4; background: #fff6f6; color: #7a1f1f;
+             border-radius: 4px; font-size: 14px; line-height: 1.5; }
+  .problem code { background: rgba(0,0,0,.06); padding: 1px 4px; border-radius: 3px; }
+  .error { padding: 40px 24px; max-width: 640px; margin: 0 auto; line-height: 1.6; }
+  .list h2 a { color: inherit; text-decoration: none; }
+  .list h2 a:hover { text-decoration: underline; }
+  .q-link { cursor: pointer; }
+  .q-link:hover text { fill: var(--link); text-decoration: underline; }
+
+  /* ---------- quadrant tabs ---------- */
+  .tabs { display: flex; gap: 2px; padding: 0 24px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  .tabs a { padding: 11px 14px 9px; text-decoration: none; color: var(--muted); font-weight: 600; font-size: 14px;
+            border-bottom: 3px solid transparent; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; }
+  .tabs a i { width: 10px; height: 10px; border-radius: 50%; }
+  .tabs a:hover { color: var(--ink); }
+  .tabs a.active { color: var(--ink); border-bottom-color: var(--c, var(--accent)); }
+
+  /* ---------- quadrant page ---------- */
+  .qview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; padding: 24px 24px 48px;
+           max-width: 1360px; margin: 0 auto; }
+  @media (max-width: 1020px) { .qview { grid-template-columns: 1fr; } }
+  .qview .radar-wrap { align-self: start; position: sticky; top: 16px; }
+  @media (max-width: 1020px) { .qview .radar-wrap { position: relative; top: 0; } }
+  #qradar svg { width: 100%; max-width: 640px; height: auto; display: block; margin: 0 auto; }
+  .q-title { font-size: 30px; margin: 0; padding-bottom: 8px; border-bottom: 4px solid var(--c); }
+  .q-desc { color: var(--muted); line-height: 1.55; margin: 12px 0 0; }
+  .ring-group > h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; margin: 28px 0 2px; }
+  .ring-group .ring-desc { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+  .ring-group .none { color: var(--muted); font-size: 14px; padding: 10px 4px; border-top: 1px solid var(--line); }
+  .acc { border-top: 1px solid var(--line); }
+  .acc:last-child { border-bottom: 1px solid var(--line); }
+  .acc > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 11px 4px;
+                 font-size: 16px; font-weight: 600; }
+  .acc > summary::-webkit-details-marker { display: none; }
+  .acc > summary::after { content: '+'; margin-left: auto; font-size: 22px; line-height: 1; color: var(--muted); font-weight: 400; }
+  .acc[open] > summary::after { content: '\2212'; }
+  .acc > summary:hover .nm { text-decoration: underline; }
+  .acc .num { width: 26px; height: 26px; border-radius: 50%; color: #fff; font-size: 11px; font-weight: 700;
+              display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .acc .st { font-size: 12px; font-weight: 600; color: var(--muted); background: var(--panel); padding: 2px 8px;
+             border-radius: 999px; white-space: nowrap; }
+  .acc .acc-body { padding: 2px 4px 20px 42px; }
+  .acc .banner { margin-bottom: 12px; }
+  .acc .history { margin-top: 4px; }
+  .acc.dim { opacity: .25; }
+
+  /* ---------- archive ---------- */
+  .tabs .tab-archive { margin-left: auto; }
+  .archive { max-width: 900px; margin: 0 auto; padding: 24px 24px 48px; }
+  .archive .intro { color: var(--muted); line-height: 1.55; margin: 12px 0 20px; }
+  .archive .empty-archive { color: var(--muted); padding: 16px 4px; border-top: 1px solid var(--line); }
+  .acc .qdot { width: 12px; height: 12px; border-radius: 50%; flex: none; margin: 0 7px; }
+  .retired-note { background: var(--panel); border-left: 4px solid var(--muted); padding: 10px 14px; margin: 0 0 14px;
+                  font-size: 14px; line-height: 1.5; }
+  .retired-note b { display: block; margin-bottom: 2px; }
+  .tile.retired { border-style: dashed; }
+  .acc-body h3 { font-size: 15px; margin: 18px 0 8px; }
+  .acc-body details > summary { cursor: pointer; font-weight: 600; font-size: 14px; margin-top: 16px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span id="logo-slot"></span>
+    <h1 id="title">Technology Radar<span class="edition" id="edition"></span></h1>
+  </div>
+  <div class="actions">
+    <input type="search" id="search" placeholder="Search the radar" aria-label="Search the radar">
+    <a class="btn btn-secondary" id="pdf" href="technology-radar.pdf?v=dev" target="_blank" rel="noopener">Download PDF</a>
+    <a class="btn" id="propose" target="_blank" rel="noopener" hidden>Propose a technology</a>
+  </div>
+</header>
+<nav class="tabs" id="tabs" aria-label="Quadrants"></nav>
+
+<section class="archive" id="archive" hidden aria-label="Archive of retired blips"></section>
+
+<div class="qview" id="qview" hidden>
+  <section class="radar-wrap" aria-label="Quadrant radar">
+    <div id="qradar"></div>
+    <div class="legend" id="qlegend"></div>
+  </section>
+  <section id="qlist" aria-label="Blips in this quadrant"></section>
+</div>
+
+<div class="layout" id="app">
+  <section class="radar-wrap" aria-label="Radar">
+    <div id="radar"></div>
+    <div class="tip" id="tip"></div>
+    <div class="legend" id="legend"></div>
+  </section>
+  <aside class="detail" id="detail" aria-live="polite">
+    <div class="empty">Select a blip on the radar or in the list below to see its details.</div>
+  </aside>
+  <section class="list" id="list" aria-label="All blips"></section>
+  <section class="rings-key" id="rings-key" aria-label="What the rings mean"></section>
+</div>
+
+
+<script>
+  // Show a clear message instead of a blank page if anything goes wrong while drawing.
+  function showProblem(detail) {
+    if (document.getElementById('problem')) return;
+    const box = document.createElement('div');
+    box.id = 'problem';
+    box.className = 'problem';
+    box.innerHTML = '<b>The radar could not be drawn.</b> Refresh the page (Ctrl+F5, or Cmd+Shift+R on a Mac). ' +
+      'If you have just published a change, wait a minute and try again.<br><small>Details: <code></code></small>';
+    box.querySelector('code').textContent = String(detail || 'unknown error');
+    const header = document.querySelector('header');
+    header.parentNode.insertBefore(box, header.nextSibling);
+  }
+  window.addEventListener('error', (e) => showProblem(e.message));
+  window.addEventListener('unhandledrejection', (e) => showProblem(e.reason && (e.reason.message || e.reason)));
+</script>
+<script src="radar-core.js?v=dev"></script>
+<script>
+(async function () {
+  'use strict';
+  const { esc, safeUrl, markdown, formatDate, statusText, bannerHtml, slugify } = RadarCore;
+  const $ = (s) => document.querySelector(s);
+
+  // ---------- load ----------
+  let model;
+  try {
+    const { config, data } = await RadarCore.load();
+    model = RadarCore.prepare(config, data);
+  } catch (e) {
+    $('#app').innerHTML = '<div class="error"><h2>The radar could not load its data</h2><p>' + esc(e.message) +
+      '</p><p>If you opened this file straight from your computer, serve the folder instead, for example with ' +
+      '<code>python -m http.server</code> inside the <code>site</code> folder.</p></div>';
+    return;
+  }
+  const { config, data, quadrants, rings, blips, bySlug, byName, retired, retiredBySlug } = model;
+  if (typeof RadarCore.related !== 'function' || !Array.isArray(retired)) {
+    showProblem('index.html and radar-core.js are from different versions. Upload both files from the same download.');
+    return;
+  }
+
+  // ---------- header ----------
+  document.title = config.title || 'Technology Radar';
+  $('#title').firstChild.textContent = config.title || 'Technology Radar';
+  if (data.edition) $('#edition').textContent = data.edition;
+  if (config.repo) {
+    const p = $('#propose');
+    p.href = 'https://github.com/' + config.repo + '/issues/new?template=propose.yml';
+    p.hidden = false;
+  }
+  const logoSrc = safeUrl(config.logo);
+  if (logoSrc) {
+    const img = document.createElement('img');
+    img.src = logoSrc;
+    img.alt = config.organisation || '';
+    img.addEventListener('error', () => img.remove());
+    const link = safeUrl(config.logoLink, true);
+    if (link) {
+      const a = document.createElement('a');
+      a.href = link; a.target = '_blank'; a.rel = 'noopener';
+      a.appendChild(img);
+      $('#logo-slot').appendChild(a);
+    } else {
+      $('#logo-slot').appendChild(img);
+    }
+  }
+
+  // ---------- which view? ----------
+  const qHref = (q) => '?q=' + slugify(q.name);
+  const params = new URLSearchParams(location.search);
+  const isArchive = params.get('view') === 'archive';
+  const qParam = (params.get('q') || '').toLowerCase();
+  const activeQ = isArchive ? null : (quadrants.find((q) => slugify(q.name) === qParam) || null);
+  const archiveHref = '?view=archive';
+
+  $('#tabs').innerHTML =
+    `<a href="${esc(location.pathname)}" class="${activeQ || isArchive ? '' : 'active'}">All quadrants</a>` +
+    quadrants.map((q) => `<a href="${qHref(q)}" style="--c:${q.color}" class="${q === activeQ ? 'active' : ''}"><i style="background:${q.color}"></i>${esc(q.name)}</a>`).join('') +
+    (retired.length || isArchive ? `<a href="${archiveHref}" class="tab-archive ${isArchive ? 'active' : ''}">Archive (${retired.length})</a>` : '');
+
+  let current = null;
+
+  // Go to a blip: on the main view select it; on a quadrant page open it there, or go to its own quadrant page.
+  // Retired blips live on the Archive tab.
+  function go(b) {
+    if (!b) return;
+    if (b.retired) return isArchive ? openItem(b, true) : (location.href = archiveHref + '#' + b.slug);
+    if (isArchive) { location.href = qHref(b.q) + '#' + b.slug; return; }
+    if (!activeQ) return select(b, true);
+    if (b.q === activeQ) return openItem(b, true);
+    location.href = qHref(b.q) + '#' + b.slug;
+  }
+
+  // ---------- main view ----------
+  function renderMainView() {
+    const svg = RadarCore.drawRadar(model, { linkQuadrants: qHref });
+    $('#radar').appendChild(svg);
+    wireBlips(svg, $('#app .radar-wrap'), (b) => select(b));
+    $('#legend').innerHTML = RadarCore.legendHtml();
+
+    const list = $('#list');
+    for (const q of quadrants) {
+      const col = document.createElement('div');
+      col.innerHTML = `<h2><i style="background:${q.color}"></i><a href="${qHref(q)}">${esc(q.name)}</a></h2>`;
+      for (const r of rings) {
+        const items = blips.filter((b) => b.q === q && b.r === r);
+        if (!items.length) continue;
+        const h = document.createElement('h4'); h.textContent = r.name; col.appendChild(h);
+        const ul = document.createElement('ul');
+        for (const b of items) {
+          const li = document.createElement('li');
+          const btn = document.createElement('button');
+          btn.textContent = `${b.num}. ${b.name}`;
+          btn.addEventListener('click', () => select(b, true));
+          li.appendChild(btn); ul.appendChild(li); b.item = li;
+        }
+        col.appendChild(ul);
+      }
+      list.appendChild(col);
+    }
+    $('#rings-key').innerHTML = rings.map((r) => `<div><b>${esc(r.name)}</b>${esc(r.description || '')}</div>`).join('');
+  }
+
+  function select(b, scrollToPanel) {
+    if (current) { current.g.classList.remove('selected'); current.item.classList.remove('active'); }
+    current = b;
+    b.g.classList.add('selected'); b.item.classList.add('active');
+    history.replaceState(null, '', location.search + '#' + b.slug);
+    const d = $('#detail');
+    d.innerHTML = `
+      <div class="head"><span>${b.num}. ${esc(b.name)}</span><button class="close" aria-label="Close">&times;</button></div>
+      ${bannerHtml(b)}
+      <div class="body">${metaHtml(b)}${bodyHtml(b)}</div>`;
+    d.querySelector('.close').addEventListener('click', clearSelection);
+    wireTiles(d);
+    RadarCore.fixBrokenBanners(d, model);
+    if (window.matchMedia('(max-width: 1020px)').matches) d.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    else if (scrollToPanel) d.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  function clearSelection() {
+    if (current) { current.g.classList.remove('selected'); current.item.classList.remove('active'); }
+    current = null;
+    history.replaceState(null, '', location.pathname + location.search);
+    $('#detail').innerHTML = '<div class="empty">Select a blip on the radar or in the list below to see its details.</div>';
+  }
+
+  // ---------- quadrant view ----------
+  function renderQuadrantView(q) {
+    $('#app').hidden = true;
+    $('#qview').hidden = false;
+    document.title = `${q.name} · ${config.title || 'Technology Radar'}`;
+
+    const svg = RadarCore.drawRadar(model, { quadrant: q });
+    $('#qradar').appendChild(svg);
+    wireBlips(svg, $('#qview .radar-wrap'), (b) => openItem(b, true));
+    $('#qlegend').innerHTML = RadarCore.legendHtml();
+
+    const groups = rings.map((r) => {
+      const items = blips.filter((b) => b.q === q && b.r === r);
+      const list = items.length ? items.map((b) => `
+        <details class="acc" id="acc-${esc(b.slug)}" data-slug="${esc(b.slug)}">
+          <summary>
+            <span class="num" style="background:${q.color};color:${RadarCore.textOn(q.color)}">${b.num}</span>
+            <span class="nm">${esc(b.name)}</span>
+            ${b.status && b.status !== 'No change' ? `<span class="st">${esc(statusText(b))}</span>` : ''}
+          </summary>
+          <div class="acc-body">${bannerHtml(b)}${bodyHtml(b)}</div>
+        </details>`).join('') : '<div class="none">Nothing in this ring yet.</div>';
+      return `<section class="ring-group"><h3>${esc(r.name)}</h3>${r.description ? `<p class="ring-desc">${esc(r.description)}</p>` : ''}${list}</section>`;
+    }).join('');
+    $('#qlist').innerHTML = `
+      <h2 class="q-title" style="--c:${q.color}">${esc(q.name)}</h2>
+      ${q.description ? `<p class="q-desc">${esc(q.description)}</p>` : ''}
+      ${groups}`;
+
+    for (const det of document.querySelectorAll('#qlist .acc')) {
+      const b = bySlug.get(det.dataset.slug);
+      b.item = det;
+      det.addEventListener('toggle', () => {
+        if (det.open) {
+          if (current && current !== b) current.g.classList.remove('selected');
+          current = b;
+          b.g.classList.add('selected');
+          history.replaceState(null, '', location.search + '#' + b.slug);
+        } else if (current === b) {
+          b.g.classList.remove('selected');
+          current = null;
+        }
+      });
+    }
+    wireTiles($('#qlist'));
+    RadarCore.fixBrokenBanners($('#qlist'), model);
+  }
+
+  function openItem(b, scroll) {
+    if (!b.item) return;
+    b.item.open = true;
+    if (scroll) b.item.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---------- shared pieces ----------
+  const ENGAGE_ICON = '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#0b5cad" d="M4 3h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H9l-4 3.5V14H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path fill="#5fa8e8" d="M20 8a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-1v3l-3.5-3H11a2 2 0 0 1-2-2v-.5h7.5A3.5 3.5 0 0 0 20 12V8z"/></svg>';
+
+  function metaHtml(b) {
+    return `<div class="meta">
+      <span class="chip" style="background:${b.q.color};color:${RadarCore.textOn(b.q.color)}">${esc(b.q.name)}</span>
+      <span class="chip" title="${esc(b.r.description || '')}">${esc(b.r.name)}</span>
+      <span class="chip">${esc(statusText(b))}</span>
+    </div>`;
+  }
+  // opts.archive: on the Archive tab, related tiles include retired blips too.
+  function bodyHtml(b, opts = {}) {
+    const engage = safeUrl(b.engage, true)
+      ? `<p><a class="engage" href="${esc(b.engage)}" target="_blank" rel="noopener">${ENGAGE_ICON}Discuss on Viva Engage</a></p>` : '';
+    const tiles = RadarCore.related(model, b, { includeRetired: !!opts.archive }).map((rel) => {
+      const rb = rel.blip;
+      if (!rb) return `<span class="tile missing"><b>${esc(rel.name)}</b><small>Not on the radar</small></span>`;
+      if (rel.retired) return `<button class="tile retired" data-slug="${esc(rb.slug)}"><b>${esc(rb.name)}</b><small>Retired</small></button>`;
+      return `<button class="tile" data-slug="${esc(rb.slug)}"><b>${esc(rb.name)}</b><small>${esc(rb.q === b.q ? rb.r.name : rb.q.name + ' · ' + rb.r.name)}</small></button>`;
+    }).join('');
+    const hist = (b.history || []).slice().reverse().map((h) => {
+      const issue = h.issue && config.repo
+        ? ` · <a class="link" href="https://github.com/${esc(config.repo)}/issues/${Number(h.issue)}" target="_blank" rel="noopener">#${Number(h.issue)}</a>` : '';
+      return `<li>${esc(formatDate(h.date))}: ${esc(h.change || '')}${issue}</li>`;
+    }).join('');
+    return `
+      <div class="desc">${markdown(b.description || '')}</div>
+      ${engage}
+      ${tiles ? `<h3>Related blips</h3><div class="tiles">${tiles}</div>` : ''}
+      ${hist ? `<details><summary>Blip history</summary><ul class="history">${hist}</ul></details>` : ''}`;
+  }
+  function wireTiles(root) {
+    root.querySelectorAll('.tile[data-slug]').forEach((t) => t.addEventListener('click', () => go(bySlug.get(t.dataset.slug) || retiredBySlug.get(t.dataset.slug))));
+  }
+
+  // Click, keyboard and tooltip handling for the blips in a radar drawing.
+  function wireBlips(svg, wrap, onSelect) {
+    const tip = document.createElement('div');
+    tip.className = 'tip';
+    wrap.appendChild(tip);
+    const show = (b) => {
+      const box = b.g.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+      tip.textContent = `${b.num}. ${b.name}`;
+      tip.style.left = (box.left + box.width / 2 - w.left) + 'px';
+      tip.style.top = (box.top - w.top) + 'px';
+      tip.style.display = 'block';
+    };
+    const hide = () => { tip.style.display = 'none'; };
+    for (const g of svg.querySelectorAll('.blip')) {
+      const b = bySlug.get(g.dataset.slug);
+      b.g = g;
+      g.setAttribute('tabindex', '0');
+      g.setAttribute('role', 'button');
+      g.addEventListener('click', () => onSelect(b));
+      g.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(b); } });
+      g.addEventListener('mouseenter', () => show(b));
+      g.addEventListener('focus', () => show(b));
+      g.addEventListener('mouseleave', hide);
+      g.addEventListener('blur', hide);
+    }
+  }
+
+  // ---------- archive view ----------
+  function renderArchiveView() {
+    $('#app').hidden = true;
+    const box = $('#archive');
+    box.hidden = false;
+    document.title = `Archive · ${config.title || 'Technology Radar'}`;
+    const items = retired.map((b) => {
+      const when = b.retired.date ? formatDate(b.retired.date) : '';
+      const from = `Retired from ${b.r.name || b.retired.ring || ''}`.trim();
+      const reason = b.retired.reason
+        ? `<div class="retired-note"><b>Why it was retired</b>${markdown(b.retired.reason)}</div>` : '';
+      return `
+        <details class="acc" id="acc-${esc(b.slug)}" data-slug="${esc(b.slug)}">
+          <summary>
+            <span class="qdot" style="background:${b.q.color}" title="${esc(b.q.name)}"></span>
+            <span class="nm">${esc(b.name)}</span>
+            <span class="st">${esc(from)}${when ? ' · ' + esc(when) : ''}</span>
+          </summary>
+          <div class="acc-body">
+            ${reason}
+            ${safeUrl(b.banner) ? bannerHtml(b) : ''}
+            <div class="meta"><span class="chip" style="background:${b.q.color};color:${RadarCore.textOn(b.q.color)}">${esc(b.q.name)}</span>
+              ${b.retired.edition ? `<span class="chip">Retired in ${esc(b.retired.edition)}</span>` : ''}</div>
+            ${bodyHtml(b, { archive: true })}
+          </div>
+        </details>`;
+    }).join('');
+    box.innerHTML = `
+      <h2 class="q-title" style="--c:var(--muted)">Archive</h2>
+      <p class="intro">Blips that have been retired from the radar. Their details and history are kept, and any of them can return in a future edition.</p>
+      ${items || '<div class="empty-archive">Nothing has been retired yet.</div>'}`;
+    for (const det of box.querySelectorAll('.acc')) {
+      const b = retiredBySlug.get(det.dataset.slug);
+      b.item = det;
+      det.addEventListener('toggle', () => {
+        if (det.open) { current = b; history.replaceState(null, '', location.search + '#' + b.slug); }
+      });
+    }
+    wireTiles(box);
+    RadarCore.fixBrokenBanners(box, model);
+  }
+
+  // ---------- render ----------
+  if (isArchive) renderArchiveView();
+  else if (activeQ) renderQuadrantView(activeQ);
+  else renderMainView();
+
+  // ---------- search ----------
+  $('#search').addEventListener('input', (e) => {
+    const term = e.target.value.trim().toLowerCase();
+    for (const b of isArchive ? retired : blips) {
+      const hit = !term || b.name.toLowerCase().includes(term) || String(b.description || '').toLowerCase().includes(term);
+      if (b.g) b.g.classList.toggle('dim', !hit);
+      if (b.item) b.item.classList.toggle('dim', !hit);
+    }
+  });
+
+  // ---------- deep links (#blip-slug) ----------
+  function fromHash() {
+    const slug = decodeURIComponent(location.hash.slice(1));
+    const gone = retiredBySlug.get(slug);
+    if (gone) {
+      if (isArchive) { if (gone !== current) openItem(gone, true); }
+      else location.replace(archiveHref + '#' + slug);  // old links to a retired blip open its Archive entry
+      return;
+    }
+    const b = bySlug.get(slug);
+    if (!b || b === current) return;
+    if (isArchive) { location.replace(qHref(b.q) + '#' + slug); return; }  // it has come back
+    if (activeQ && b.q !== activeQ) return;
+    activeQ ? openItem(b, true) : select(b);
+  }
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+})();
+</script>
+</body>
+</html>

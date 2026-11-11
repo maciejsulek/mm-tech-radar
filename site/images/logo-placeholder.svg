@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 40">
+  <rect x="1" y="1" width="148" height="38" rx="6" fill="#ffffff" stroke="#9aa3b2" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <circle cx="22" cy="20" r="9" fill="#000000"/>
+  <circle cx="22" cy="20" r="4" fill="#ffffff"/>
+  <text x="40" y="25" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="600" fill="#5b6475">Your logo</text>
+</svg>

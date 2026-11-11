@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Technology Radar report</title>
+<style>
+  :root {
+    --ink: #1d2433;
+    --muted: #5b6475;
+    --line: #d5dae3;
+    --panel: #eef1f5;
+    --accent: #16384c;
+    --link: #0b5cad;
+  }
+  html { font-family: "Segoe UI", "Helvetica Neue", Arial, "Liberation Sans", sans-serif; color: var(--ink); }
+  body { margin: 0; font-size: 10.5pt; line-height: 1.5; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* ---------- pages ---------- */
+  @page {
+    size: A4;
+    margin: 18mm 17mm 20mm;
+    @bottom-left { font-size: 8pt; color: var(--muted); }
+    @bottom-center { content: string(section); font-size: 8pt; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+    @bottom-right { content: counter(page); font-size: 8pt; color: var(--muted); }
+  }
+  @page cover { margin: 0; @bottom-left { content: none; } @bottom-center { content: none; } @bottom-right { content: none; } }
+  @page toc { @bottom-center { content: none; } }
+
+  .chapter { break-before: page; }
+  h1.sec { string-set: section content(text); font-size: 24pt; line-height: 1.15; margin: 0 0 6mm; padding-bottom: 3mm;
+           border-bottom: 2.5pt solid var(--highlight); }
+  h2, h3, h4 { break-after: avoid; }
+  p { margin: 0 0 3mm; orphans: 3; widows: 3; }
+  a { color: var(--link); text-decoration: none; }
+  ul { margin: 0 0 3mm; padding-left: 5mm; }
+
+  /* ---------- cover ---------- */
+  .cover { page: cover; height: 297mm; display: flex; flex-direction: column; background: var(--accent);
+           color: var(--on-accent, #fff); position: relative; overflow: hidden; }
+  .cover-top { height: 62mm; padding: 18mm 18mm 0; display: flex; justify-content: flex-end; align-items: flex-start; }
+  .cover-top img { height: 16mm; width: auto; max-width: 90mm; object-fit: contain; display: block; }
+  .cover-top .logo-plate { background: #fff; padding: 4mm 5mm; border-radius: 1.5mm; }
+  .cover-top .logo-plate img { height: 13mm; }
+  .cover-main { flex: 1; padding: 40mm 20mm 0; }
+  .cover-main .kicker { font-size: 12pt; letter-spacing: .14em; text-transform: uppercase; opacity: .8; margin: 0 0 5mm; }
+  .cover-main h1 { font-size: 44pt; line-height: 1.05; margin: 0 0 8mm; max-width: 140mm; }
+  .cover-main .edition { font-size: 18pt; margin: 0 0 2mm; }
+  .cover-main .org { font-size: 12pt; opacity: .8; margin: 0; }
+  .cover svg { position: absolute; right: -10mm; bottom: -10mm; width: 150mm; height: 150mm; }
+
+  /* ---------- contents ---------- */
+  .toc { page: toc; }
+  .toc h1.sec { string-set: none; }
+  .toc ol { list-style: none; padding: 0; margin: 0; font-size: 12pt; }
+  .toc li { margin: 0 0 3.5mm; }
+  .toc li.sub { margin-left: 7mm; font-size: 11pt; }
+  .toc a { color: var(--ink); display: flex; align-items: baseline; gap: 2mm; }
+  .toc a .fill { flex: 1; border-bottom: 1px dotted #9aa3b2; transform: translateY(-1mm); }
+  .toc a::after { content: target-counter(attr(href), page); min-width: 8mm; text-align: right; }
+  .toc i { width: 3mm; height: 3mm; border-radius: 50%; display: inline-block; margin-right: 1mm; }
+
+  /* ---------- text sections ---------- */
+  .md h2 { font-size: 15pt; margin: 7mm 0 3mm; color: var(--accent); }
+  .md h3 { font-size: 12pt; margin: 5mm 0 2mm; }
+  .sec-contributors ul { list-style: none; padding: 0; columns: 3; column-gap: 8mm; }
+  .sec-contributors li { break-inside: avoid; margin: 0 0 2mm; }
+
+  /* ---------- radar at a glance ---------- */
+  .glance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 8mm; margin: 5mm 0 8mm; }
+  .ring-card { border-left: 2mm solid var(--accent); padding: 1mm 0 1mm 4mm; break-inside: avoid; }
+  .ring-card b { display: block; font-size: 12pt; }
+  .ring-card span { color: var(--muted); }
+  .quad-list { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm 8mm; margin: 4mm 0 8mm; }
+  .quad-list div { display: flex; align-items: center; gap: 3mm; }
+  .quad-list i { width: 4mm; height: 4mm; border-radius: 50%; flex: none; }
+  .moves { width: 100%; border-collapse: collapse; margin-top: 4mm; }
+  .moves td { padding: 2.5mm 3mm; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  .moves td:first-child { width: 14mm; }
+  h2.small { font-size: 13pt; margin: 6mm 0 2mm; color: var(--accent); }
+
+  /* ---------- full radar ---------- */
+  #full-radar-slot svg { width: 100%; height: auto; display: block; }
+  .legend { display: flex; gap: 8mm; justify-content: center; font-size: 9.5pt; color: var(--muted); margin-top: 4mm; }
+  .legend span { display: inline-flex; align-items: center; gap: 2mm; white-space: nowrap; }
+  .legend svg { flex: none; }
+
+  /* ---------- quadrant sections ---------- */
+  .q-radar svg { width: 100%; max-height: 120mm; height: auto; display: block; margin: 0 auto; }
+  .q-index { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5mm; margin: 6mm 0 0; font-size: 9.5pt; break-inside: avoid; }
+  .q-index h4 { margin: 0 0 1.5mm; font-size: 8.5pt; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+                border-bottom: 1px solid var(--line); padding-bottom: 1mm; }
+  .q-index ol { list-style: none; padding: 0; margin: 0; line-height: 1.45; }
+  .q-index a { color: var(--ink); }
+  .writeups { break-before: page; }
+  .wu { margin: 0 0 9mm; padding-bottom: 6mm; border-bottom: 1px solid var(--line); }
+  .wu:last-child { border-bottom: 0; }
+  .wu .keep { break-inside: avoid; }
+  .wu-head { display: flex; align-items: center; gap: 3.5mm; margin: 0 0 3mm; }
+  .wu-num { width: 9mm; height: 9mm; border-radius: 50%; font-weight: 700; font-size: 9.5pt;
+            display: flex; align-items: center; justify-content: center; flex: none; }
+  .wu-head h2 { font-size: 15pt; margin: 0; line-height: 1.2; }
+  .wu-meta { font-size: 9pt; color: var(--muted); margin-top: .5mm; }
+  .wu-meta b { color: var(--ink); }
+  .banner { display: block; width: 100%; aspect-ratio: 4 / 1; object-fit: cover; margin: 0 0 4mm; background: var(--panel); }
+  .banner-fallback { display: none; }
+  .wu .extra { font-size: 9pt; color: var(--muted); margin: 2mm 0 0; }
+  .wu .extra b { color: var(--ink); }
+  .wu .extra a { word-break: break-all; }
+
+  /* ---------- retired this edition ---------- */
+  .retired-table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin-top: 4mm; }
+  .retired-table th { text-align: left; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+                      border-bottom: 1.5pt solid var(--ink); padding: 2mm 3mm 2mm 0; white-space: nowrap; }
+  .retired-table td { border-bottom: 1px solid var(--line); padding: 2.5mm 3mm 2.5mm 0; vertical-align: top; }
+  .retired-table tr { break-inside: avoid; }
+  .retired-table td p { margin: 0 0 1.5mm; }
+  .retired-table td:nth-child(1) { width: 20%; }
+  .retired-table td:nth-child(2) { width: 22%; white-space: nowrap; }
+  .retired-table td:nth-child(3) { width: 14%; white-space: nowrap; }
+  .retired-table .qdot { width: 2.6mm; height: 2.6mm; border-radius: 50%; display: inline-block; margin-right: 1.8mm; }
+  .muted { color: var(--muted); }
+
+  /* ---------- on-screen preview ---------- */
+  @media screen {
+    body { background: #e4e8ee; }
+    .pagedjs_pages { display: flex; flex-direction: column; align-items: center; gap: 8mm; padding: 10mm 0; }
+    .pagedjs_page { background: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, .18); }
+  }
+</style>
+<script src="radar-core.js?v=dev"></script>
+<script>
+  // Builds the report from the radar data, then Paged.js lays it out as A4 pages.
+  // scripts/build-pdf.mjs waits for window.__reportReady before printing it to PDF.
+  window.addEventListener('error', (e) => { window.__reportError = String(e.message || e); });
+  window.PagedConfig = {
+    before: async () => {
+      try { await buildReport(); } catch (e) { window.__reportError = String(e && e.stack || e); throw e; }
+    },
+    after: () => { window.__reportReady = true; },
+  };
+
+  async function buildReport() {
+    const { esc, markdown, safeUrl, statusText, bannerHtml, slugify } = RadarCore;
+    const { config, data } = await RadarCore.load();
+    const model = RadarCore.prepare(config, data);
+    const { quadrants, rings, blips } = model;
+    const reportMd = await RadarCore.getText('data/report.md');
+    const title = config.title || 'Technology Radar';
+    document.title = title + (data.edition ? ' · ' + data.edition : '');
+
+    // Footer copyright line (CSS needs it as a quoted string).
+    const copyright = config.copyright || `© ${new Date().getFullYear()} ${config.organisation || ''}`.trim();
+    const style = document.createElement('style');
+    style.textContent = `@page { @bottom-left { content: "${copyright.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"; } }`;
+    document.head.appendChild(style);
+
+    // ----- sections from data/report.md ("# Heading" starts a section) -----
+    const sections = [];
+    let cur = null;
+    for (const line of reportMd.replace(/\r\n/g, '\n').split('\n')) {
+      const m = line.match(/^#\s+(.+?)\s*$/);
+      if (m) { cur = { title: m[1], body: '' }; sections.push(cur); }
+      else if (cur) cur.body += line + '\n';
+    }
+    const usable = sections.filter((s) => s.body.trim());
+    const about = usable.find((s) => /^about/i.test(s.title));
+    const others = usable.filter((s) => s !== about);
+
+    // ----- contents -----
+    const chapters = [];
+    if (about) chapters.push({ id: 'sec-about', title: about.title });
+    chapters.push({ id: 'sec-glance', title: 'Radar at a glance' });
+    others.forEach((s) => chapters.push({ id: 'sec-' + slugify(s.title), title: s.title }));
+    chapters.push({ id: 'sec-radar', title: 'The radar' });
+    quadrants.forEach((q) => chapters.push({ id: 'sec-q-' + slugify(q.name), title: q.name, color: q.color, sub: true }));
+    // Optional closing section: blips retired in this edition (switch off with "report": { "showRetired": false }).
+    const showRetired = !(config.report && config.report.showRetired === false);
+    const retiredNow = showRetired ? model.retired.filter((b) => (b.retired.edition || '') === (data.edition || '')) : [];
+    if (retiredNow.length) chapters.push({ id: 'sec-retired', title: 'Retired this edition' });
+
+    // The cover is a solid colour, so it can use a separate (for example white) version of the logo.
+    const coverLogo = safeUrl(config.coverLogo) || safeUrl(config.logo);
+    const html = [];
+
+    html.push(`
+      <section class="cover">
+        <div class="cover-top">${coverLogo ? (config.coverLogo
+          ? `<img src="${esc(coverLogo)}" alt="${esc(config.organisation || '')}">`
+          // No light version of the logo given: put the normal logo on a white panel so it stays readable.
+          : `<div class="logo-plate"><img src="${esc(coverLogo)}" alt="${esc(config.organisation || '')}"></div>`) : ''}</div>
+        <div class="cover-main">
+          <p class="kicker">${esc(config.organisation || '')}</p>
+          <h1>${esc(title)}</h1>
+          ${data.edition ? `<p class="edition">${esc(data.edition)}</p>` : ''}
+          ${coverRings()}
+        </div>
+      </section>`);
+
+    html.push(`
+      <section class="toc">
+        <h1 class="sec">Contents</h1>
+        <ol>${chapters.map((c) => `<li class="${c.sub ? 'sub' : ''}"><a href="#${c.id}">${c.color ? `<i style="background:${c.color}"></i>` : ''}${esc(c.title)}<span class="fill"></span></a></li>`).join('')}</ol>
+      </section>`);
+
+    if (about) html.push(textSection('sec-about', about));
+
+    html.push(`
+      <section class="chapter" id="sec-glance">
+        <h1 class="sec">Radar at a glance</h1>
+        <p>The radar places each technology in one of four quadrants, by what kind of thing it is, and one of four rings, by how strongly we recommend it. Each technology is a numbered blip.</p>
+        <h2 class="small">Quadrants</h2>
+        <div class="quad-list">${quadrants.map((q) => `<div><i style="background:${q.color}"></i><span><b>${esc(q.name)}</b> · ${blips.filter((b) => b.q === q).length} blips</span></div>`).join('')}</div>
+        <h2 class="small">Rings</h2>
+        <div class="glance-grid">${rings.map((r) => `<div class="ring-card"><b>${esc(r.name)}</b><span>${esc(r.description || '')}</span></div>`).join('')}</div>
+        <h2 class="small">Markers</h2>
+        <table class="moves">
+          <tr><td>${marker('new')}</td><td><b>New</b>: added in this edition.</td></tr>
+          <tr><td>${marker('moved')}</td><td><b>Moved in/out</b>: changed ring since the last edition. The arc shows the side it moved from.</td></tr>
+          <tr><td>${marker('none')}</td><td><b>No change</b>: in the same ring as the last edition.</td></tr>
+        </table>
+      </section>`);
+
+    others.forEach((s) => html.push(textSection('sec-' + slugify(s.title), s)));
+
+    html.push(`
+      <section class="chapter radar-full" id="sec-radar">
+        <h1 class="sec">The radar</h1>
+        <div id="full-radar-slot"></div>
+        <div class="legend">${RadarCore.legendHtml()}</div>
+      </section>`);
+
+    for (const q of quadrants) {
+      const items = blips.filter((b) => b.q === q);
+      const index = rings.map((r) => {
+        const inRing = items.filter((b) => b.r === r);
+        return `<div><h4>${esc(r.name)}</h4><ol>${inRing.length
+          ? inRing.map((b) => `<li><a href="#blip-${esc(b.slug)}">${b.num}. ${esc(b.name)}</a></li>`).join('')
+          : '<li>—</li>'}</ol></div>`;
+      }).join('');
+      html.push(`
+        <section class="chapter quadrant" id="sec-q-${slugify(q.name)}">
+          <h1 class="sec" style="border-color:${q.color}">${esc(q.name)}</h1>
+          ${q.description ? `<p style="color:var(--muted)">${esc(q.description)}</p>` : ''}
+          <div class="q-radar" data-quadrant="${q.index}"></div>
+          <div class="q-index">${index}</div>
+          ${items.length ? `<div class="writeups">${items.map((b) => writeup(b)).join('')}</div>` : ''}
+        </section>`);
+    }
+
+    if (retiredNow.length) {
+      html.push(`
+        <section class="chapter" id="sec-retired">
+          <h1 class="sec">Retired this edition</h1>
+          <p>These blips have left the radar in this edition. Their details and history are kept in the radar's Archive, and any of them can return in a future edition.</p>
+          <table class="retired-table">
+            <thead><tr><th>Blip</th><th>Quadrant</th><th>Retired from</th><th>Why</th></tr></thead>
+            <tbody>${retiredNow.map((b) => `
+              <tr>
+                <td><b>${esc(b.name)}</b></td>
+                <td><span class="qdot" style="background:${b.q.color}"></span>${esc(b.q.name)}</td>
+                <td>${esc(b.retired.ring || b.r.name || '')}</td>
+                <td>${b.retired.reason ? markdown(b.retired.reason) : '<span class="muted">No reason given.</span>'}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </section>`);
+    }
+
+    document.body.innerHTML = html.join('');
+
+    document.getElementById('full-radar-slot').appendChild(RadarCore.drawRadar(model));
+    document.querySelectorAll('.q-radar').forEach((slot) => {
+      slot.appendChild(RadarCore.drawRadar(model, { quadrant: quadrants[Number(slot.dataset.quadrant)] }));
+    });
+
+    // Wait for banners and the logo; drop any that fail to load.
+    await Promise.race([
+      Promise.all([...document.images].map((img) => img.complete ? null : new Promise((res) => {
+        img.addEventListener('load', res, { once: true });
+        img.addEventListener('error', res, { once: true });
+      }))),
+      new Promise((res) => setTimeout(res, 15000)),
+    ]);
+    document.querySelectorAll('img').forEach((img) => { if (!img.naturalWidth) img.remove(); });
+
+    // ----- helpers -----
+    function textSection(id, s) {
+      return `<section class="chapter md sec-${slugify(s.title)}" id="${id}"><h1 class="sec">${esc(s.title)}</h1>${markdown(s.body, { headingLevel: 2 })}</section>`;
+    }
+    function writeup(b) {
+      // Retired blips are left out of related links (they come back automatically if the blip returns).
+      const related = RadarCore.related(model, b).map((rel) => rel.blip
+        ? `<a href="#blip-${esc(rel.blip.slug)}">${rel.blip.num}. ${esc(rel.blip.name)}</a>` : esc(rel.name)).join(', ');
+      const engage = safeUrl(b.engage, true);
+      return `
+        <article class="wu" id="blip-${esc(b.slug)}">
+          <div class="keep">
+            <div class="wu-head">
+              <span class="wu-num" style="background:${b.q.color};color:${RadarCore.textOn(b.q.color)}">${b.num}</span>
+              <div><h2>${esc(b.name)}</h2><div class="wu-meta"><b>${esc(b.r.name)}</b> · ${esc(statusText(b))}</div></div>
+            </div>
+            ${bannerHtml(b)}
+          </div>
+          ${markdown(b.description || '')}
+          ${related ? `<p class="extra"><b>Related:</b> ${related}</p>` : ''}
+          ${engage ? `<p class="extra"><b>Discuss on Viva Engage:</b> <a href="${esc(engage)}">${esc(engage)}</a></p>` : ''}
+        </article>`;
+    }
+    function marker(kind) {
+      const c = RadarCore.theme().primary;
+      const dot = `<circle cx="14" cy="14" r="7" fill="${c}"/>`;
+      const extra = kind === 'new' ? `<circle cx="14" cy="14" r="11" fill="none" stroke="${c}" stroke-width="1.8"/>`
+        : kind === 'moved' ? `<path d="M6.5,7.5 A11,11 0 0 1 21.5,7.5" fill="none" stroke="${c}" stroke-width="2.2"/>` : '';
+      return `<svg width="28" height="28" viewBox="0 0 28 28">${extra}${dot}</svg>`;
+    }
+    function coverRings() {
+      // Use the highlight colour for the rings, or white/black if it is the same as the cover colour.
+      const t = RadarCore.theme();
+      const same = String(t.highlight).toLowerCase() === String(t.primary).toLowerCase();
+      const ringColour = same ? RadarCore.textOn(t.primary) : t.highlight;
+      const arcs = [0.32, 0.58, 0.8, 1].map((f) => `<circle cx="150" cy="150" r="${(f * 140).toFixed(1)}" fill="none" stroke="${ringColour}" stroke-opacity="${same ? '.28' : '.55'}" stroke-width="1.4"/>`).join('');
+      const dots = quadrants.map((q, i) => `<circle cx="${[70, 110, 95, 125][i]}" cy="${[95, 60, 120, 100][i]}" r="5" fill="${q.color}" stroke="#fff" stroke-width="1.2"/>`).join('');
+      return `<svg viewBox="0 0 150 150" aria-hidden="true">${arcs}${dots}</svg>`;
+    }
+  }
+</script>
+<script src="vendor/paged.polyfill.min.js?v=dev"></script>
+</head>
+<body></body>
+</html>

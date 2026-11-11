@@ -1,0 +1,225 @@
+{
+  "edition": "November 2026",
+  "updated": "2026-11-11",
+  "blips": [
+    {
+      "name": "Revit",
+      "slug": "revit",
+      "quadrant": "Design",
+      "ring": "Adopt",
+      "status": "New",
+      "description": "Autodesk Revit is a commercial Building Information Modeling (BIM) software platform developed by [Autodesk](https://www.autodesk.com) for architects, structural engineers, mechanical, electrical, and plumbing (MEP) engineers, and construction professionals.",
+      "related": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "ring": "Adopt",
+          "change": "Added",
+          "issue": 1
+        }
+      ]
+    },
+    {
+      "name": "Common data environment (ISO 19650)",
+      "slug": "common-data-environment-iso-19650",
+      "quadrant": "Enabling",
+      "ring": "Adopt",
+      "status": "No change",
+      "description": "A single, controlled place for project information, run to the ISO 19650 workflow (work in progress, shared, published, archived). It is the default for all new projects.",
+      "related": [
+        "Autodesk Construction Cloud",
+        "Revit"
+      ],
+      "history": [
+        {
+          "date": "2026-05-04",
+          "ring": "Adopt",
+          "change": "Added"
+        }
+      ],
+      "sample": true
+    },
+    {
+      "name": "Autodesk Construction Cloud",
+      "slug": "autodesk-construction-cloud",
+      "quadrant": "Enabling",
+      "ring": "Trial",
+      "status": "New",
+      "description": "Cloud platform for document control, model coordination and site workflows in one place. Being trialled on two projects as a common data environment.",
+      "related": [
+        "Common data environment (ISO 19650)",
+        "Revit"
+      ],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "ring": "Trial",
+          "change": "Added"
+        }
+      ],
+      "sample": true
+    },
+    {
+      "name": "Generative AI for document review",
+      "slug": "generative-ai-for-document-review",
+      "quadrant": "Enabling",
+      "ring": "Assess",
+      "status": "New",
+      "description": "Using AI assistants to summarise specifications, check submittals against requirements and draft responses. Promising, but outputs still need full human review.",
+      "related": [
+        "Common data environment (ISO 19650)"
+      ],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "ring": "Assess",
+          "change": "Added"
+        }
+      ],
+      "sample": true
+    },
+    {
+      "name": "Dynamo",
+      "slug": "dynamo",
+      "quadrant": "Design",
+      "ring": "Adopt",
+      "status": "No change",
+      "description": "Visual programming for Revit, used to automate repetitive modelling tasks and design checks. A standard part of the design team's toolkit.",
+      "related": [
+        "Revit",
+        "Grasshopper"
+      ],
+      "history": [
+        {
+          "date": "2026-05-04",
+          "ring": "Adopt",
+          "change": "Added"
+        }
+      ],
+      "sample": true
+    },
+    {
+      "name": "Grasshopper",
+      "slug": "grasshopper",
+      "quadrant": "Design",
+      "ring": "Trial",
+      "status": "No change",
+      "description": "Visual programming for Rhino, suited to complex geometry and design option studies. Useful alongside Revit on facade and structural form-finding work.",
+      "related": [
+        "Dynamo",
+        "Revit"
+      ],
+      "history": [
+        {
+          "date": "2026-05-04",
+          "ring": "Trial",
+          "change": "Added"
+        }
+      ],
+      "sample": true
+    },
+    {
+      "name": "Drone surveys and photogrammetry",
+      "slug": "drone-surveys-and-photogrammetry",
+      "quadrant": "Construction",
+      "ring": "Trial",
+      "status": "Moved",
+      "description": "Regular drone flights produce site models for progress tracking, volume calculations and as-built checks. Moved to Trial after successful use on three sites.",
+      "related": [
+        "Digital twins for operations"
+      ],
+      "previousRing": "Assess",
+      "history": [
+        {
+          "date": "2026-05-04",
+          "ring": "Assess",
+          "change": "Added"
+        },
+        {
+          "date": "2026-11-11",
+          "ring": "Trial",
+          "change": "Moved from Assess to Trial"
+        }
+      ],
+      "sample": true
+    },
+    {
+      "name": "Offsite modular construction",
+      "slug": "offsite-modular-construction",
+      "quadrant": "Construction",
+      "ring": "Assess",
+      "status": "New",
+      "description": "Manufacturing building elements or whole modules in a factory, then assembling them on site. Can cut programme time and waste; needs design for manufacture and assembly from the start.",
+      "related": [
+        "Dynamo"
+      ],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "ring": "Assess",
+          "change": "Added"
+        }
+      ],
+      "sample": true
+    },
+    {
+      "name": "Paper-based site diaries",
+      "slug": "paper-based-site-diaries",
+      "quadrant": "Construction",
+      "ring": "Caution",
+      "status": "No change",
+      "description": "Handwritten diaries and forms are hard to search, share or analyse. Use the digital site forms in the common data environment for new projects.",
+      "related": [
+        "Common data environment (ISO 19650)"
+      ],
+      "history": [
+        {
+          "date": "2026-05-04",
+          "ring": "Caution",
+          "change": "Added"
+        }
+      ],
+      "sample": true
+    },
+    {
+      "name": "COBie asset data handover",
+      "slug": "cobie-asset-data-handover",
+      "quadrant": "Commissioning & Handover",
+      "ring": "Adopt",
+      "status": "No change",
+      "description": "Structured asset information handed to the client in COBie format, so maintenance teams get usable data rather than boxes of manuals.",
+      "related": [
+        "Digital twins for operations",
+        "Revit"
+      ],
+      "history": [
+        {
+          "date": "2026-05-04",
+          "ring": "Adopt",
+          "change": "Added"
+        }
+      ],
+      "sample": true
+    },
+    {
+      "name": "Digital twins for operations",
+      "slug": "digital-twins-for-operations",
+      "quadrant": "Commissioning & Handover",
+      "ring": "Assess",
+      "status": "New",
+      "description": "Connecting the as-built model to live sensor and maintenance data, so clients can run the asset from a digital replica. Worth exploring with clients who have the data maturity.",
+      "related": [
+        "COBie asset data handover",
+        "Drone surveys and photogrammetry"
+      ],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "ring": "Assess",
+          "change": "Added"
+        }
+      ],
+      "sample": true
+    }
+  ]
+}
