@@ -1,0 +1,86 @@
+name: Add blip from approved proposal
+
+# Runs when a maintainer adds the "approved" label to a proposal issue.
+on:
+  issues:
+    types: [labeled]
+
+# One radar update at a time, so two approvals never overwrite each other.
+concurrency:
+  group: radar-data
+  cancel-in-progress: false
+
+jobs:
+  add-blip:
+    if: github.event.label.name == 'approved'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    outputs:
+      ok: ${{ steps.apply.outputs.ok }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Update radar data from the issue
+        id: apply
+        run: node scripts/radar.mjs add-from-issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit the change
+        if: steps.apply.outputs.ok == 'true'
+        env:
+          BLIP_NAME: ${{ steps.apply.outputs.name }}
+          ISSUE: ${{ github.event.issue.number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/data site/images notes
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+          else
+            git commit -m "Radar: $BLIP_NAME (#$ISSUE)"
+            git pull --rebase
+            git push
+          fi
+
+      - name: Report success on the issue
+        if: steps.apply.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ github.event.issue.number }}
+          MESSAGE: ${{ steps.apply.outputs.message }}
+        run: |
+          gh issue comment "$ISSUE" --repo "$GITHUB_REPOSITORY" --body "$MESSAGE"
+          gh issue close "$ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
+
+      - name: Report a problem on the issue
+        if: failure() || steps.apply.outputs.ok == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE: ${{ github.event.issue.number }}
+          MESSAGE: ${{ steps.apply.outputs.message }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$MESSAGE" ]; then
+            MESSAGE="Something went wrong while adding this to the radar. The details are in the workflow run: $RUN_URL"
+          fi
+          gh issue comment "$ISSUE" --repo "$GITHUB_REPOSITORY" --body "$MESSAGE"
+          gh issue edit "$ISSUE" --repo "$GITHUB_REPOSITORY" --remove-label approved || true
+
+  # Pushes made by the workflow's own token don't trigger other workflows, so publish explicitly.
+  deploy:
+    needs: add-blip
+    if: needs.add-blip.outputs.ok == 'true'
+    uses: ./.github/workflows/deploy.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
