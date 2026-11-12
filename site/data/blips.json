@@ -3,36 +3,32 @@
   "updated": "2026-11-11",
   "blips": [
     {
-      "name": "Plant 3D",
-      "slug": "plant-3D",
+      "name": "Autodesk Plant 3D",
+      "slug": "autodesk-plant-3d",
       "quadrant": "Design",
       "ring": "Adopt",
-      "status": "New",
+      "status": "No Change",
       "description": "AutoCAD Plant 3D is a specialized 3D computer-aided design (CAD) software developed by Autodesk for designing, modeling, and documenting process plants, such as oil and gas facilities, chemical plants, water treatment systems, and food and beverage manufacturing units. It is built directly on the familiar AutoCAD platform and included as part of standard AutoCAD subscriptions.",
       "related": [],
       "history": [
         {
           "date": "2026-11-11",
           "ring": "Adopt",
-          "change": "Added",
-          "issue": 1
+          "change": "Added"
         }
       ]
     },
     {
-      "name": "Common data environment (ISO 19650)",
-      "slug": "common-data-environment-iso-19650",
-      "quadrant": "Enabling",
+      "name": "Autodesk Forma Build",
+      "slug": "autodesk-forma-build",
+      "quadrant": "Commissioning & Handover",
       "ring": "Adopt",
       "status": "No change",
-      "description": "A single, controlled place for project information, run to the ISO 19650 workflow (work in progress, shared, published, archived). It is the default for all new projects.",
-      "related": [
-        "Autodesk Construction Cloud",
-        "Revit"
-      ],
+      "description": "Forma Build (previously known as Autodesk Build) is a unified construction management and field execution platform that connects office and site teams.",
+      "related": [],
       "history": [
         {
-          "date": "2026-05-04",
+          "date": "2026-11-1",
           "ring": "Adopt",
           "change": "Added"
         }
@@ -40,34 +36,31 @@
       "sample": true
     },
     {
-      "name": "Autodesk Construction Cloud",
-      "slug": "autodesk-construction-cloud",
-      "quadrant": "Enabling",
-      "ring": "Trial",
-      "status": "New",
-      "description": "Cloud platform for document control, model coordination and site workflows in one place. Being trialled on two projects as a common data environment.",
-      "related": [
-        "Common data environment (ISO 19650)",
-        "Revit"
-      ],
+      "name": "Autodesk Civil 3D",
+      "slug": "autodesk-civil-3d",
+      "quadrant": "Design",
+      "ring": "Adopt",
+      "status": "No change",
+      "description": "Autodesk Civil 3D is a 3D model-based infrastructure design and documentation software built on AutoCAD, designed for civil engineers, surveyors, and urban planners.",
+      "related": [],
       "history": [
         {
           "date": "2026-11-11",
-          "ring": "Trial",
+          "ring": "Adopt",
           "change": "Added"
         }
       ],
       "sample": true
     },
     {
-      "name": "Generative AI for document review",
-      "slug": "generative-ai-for-document-review",
-      "quadrant": "Enabling",
+      "name": "Autodesk Forma Model Coordination",
+      "slug": "autodesk-forma-model-coordination",
+      "quadrant": "Design",
       "ring": "Assess",
       "status": "New",
-      "description": "Using AI assistants to summarise specifications, check submittals against requirements and draft responses. Promising, but outputs still need full human review.",
+      "description": "Autodesk Forma Model Coordination connects teams with coordination reviews, automated clash detection, and issue management across integrated tools.",
       "related": [
-        "Common data environment (ISO 19650)"
+        "Autodesk Forma Build"
       ],
       "history": [
         {
@@ -79,19 +72,16 @@
       "sample": true
     },
     {
-      "name": "Dynamo",
-      "slug": "dynamo",
-      "quadrant": "Design",
+      "name": "Komatsu Intelligent Machine Control",
+      "slug": "komatsu-intelligent-machine-control",
+      "quadrant": "Construction",
       "ring": "Adopt",
       "status": "No change",
-      "description": "Visual programming for Revit, used to automate repetitive modelling tasks and design checks. A standard part of the design team's toolkit.",
-      "related": [
-        "Revit",
-        "Grasshopper"
-      ],
+      "description": "Komatsu Intelligent Machine Control (iMC) is a factory-integrated 3D GPS/GNSS and semi-automatic machine control technology for construction and earthmoving equipment like dozers and excavators.",
+      "related": [],
       "history": [
         {
-          "date": "2026-05-04",
+          "date": "2026-11-11",
           "ring": "Adopt",
           "change": "Added"
         }
@@ -99,60 +89,47 @@
       "sample": true
     },
     {
-      "name": "Grasshopper",
-      "slug": "grasshopper",
-      "quadrant": "Design",
-      "ring": "Trial",
+      "name": "Morta",
+      "slug": "morta",
+      "quadrant": "Enabling",
+      "ring": "Adopt",
       "status": "No change",
-      "description": "Visual programming for Rhino, suited to complex geometry and design option studies. Useful alongside Revit on facade and structural form-finding work.",
-      "related": [
-        "Dynamo",
-        "Revit"
-      ],
+      "description": "Morta is a connected project controls and information platform for the construction, infrastructure, and AEC (architecture, engineering, and construction) industries.",
+      "related": [],
       "history": [
-        {
-          "date": "2026-05-04",
-          "ring": "Trial",
-          "change": "Added"
-        }
-      ],
-      "sample": true
-    },
-    {
-      "name": "Drone surveys and photogrammetry",
-      "slug": "drone-surveys-and-photogrammetry",
-      "quadrant": "Construction",
-      "ring": "Trial",
-      "status": "Moved",
-      "description": "Regular drone flights produce site models for progress tracking, volume calculations and as-built checks. Moved to Trial after successful use on three sites.",
-      "related": [
-        "Digital twins for operations"
-      ],
-      "previousRing": "Assess",
-      "history": [
-        {
-          "date": "2026-05-04",
-          "ring": "Assess",
-          "change": "Added"
-        },
         {
           "date": "2026-11-11",
-          "ring": "Trial",
-          "change": "Moved from Assess to Trial"
+          "ring": "Adopt",
+          "change": "Added"
         }
       ],
       "sample": true
     },
     {
-      "name": "Offsite modular construction",
-      "slug": "offsite-modular-construction",
+      "name": "Trimble SiteVision",
+      "slug": "trimble-site-vision",
+      "quadrant": "Construction",
+      "ring": "Assess",
+      "status": "No change",
+      "description": "Trimble SiteVision is an outdoor, real-time augmented reality (AR) and spatial data visualization system designed for construction, engineering, and utility industries. It allows field teams to overlay 2D and 3D digital design models onto the physical world at a 1:1 scale.",
+      "related": [],
+      "history": [
+        {
+          "date": "2026-11-11",
+          "ring": "Assess",
+          "change": "Added"
+        }
+      ],
+      "sample": true
+    },
+    {
+      "name": "Leica iCON (Captivate)",
+      "slug": "leica-icon-(captivate)",
       "quadrant": "Construction",
       "ring": "Assess",
       "status": "New",
-      "description": "Manufacturing building elements or whole modules in a factory, then assembling them on site. Can cut programme time and waste; needs design for manufacture and assembly from the start.",
-      "related": [
-        "Dynamo"
-      ],
+      "description": "Leica iCON field for Building Construction is tailored for the many tasks and projects Construction Professionals undertake everyday, without the need to be experienced measurement specialists. Leica iCON enables users to layout complex designs directly from reliable design data without disruption to existing processes or without requiring the user to be an experienced measurement specialist.",
+      "related": [],
       "history": [
         {
           "date": "2026-11-11",
@@ -180,19 +157,16 @@
       "sample": true
     },
     {
-      "name": "COBie asset data handover",
-      "slug": "cobie-asset-data-handover",
-      "quadrant": "Commissioning & Handover",
+      "name": "OpenSpaceAI",
+      "slug": "openspaceai",
+      "quadrant": "Enabling",
       "ring": "Adopt",
       "status": "No change",
-      "description": "Structured asset information handed to the client in COBie format, so maintenance teams get usable data rather than boxes of manuals.",
-      "related": [
-        "Digital twins for operations",
-        "Revit"
-      ],
+      "description": "OpenSpace (Open Space Labs, Inc.) is an AI-powered visual intelligence and jobsite documentation platform for builders, general contractors, trades, and project owners.",
+      "related": [],
       "history": [
         {
-          "date": "2026-05-04",
+          "date": "2026-11-11",
           "ring": "Adopt",
           "change": "Added"
         }
@@ -200,20 +174,19 @@
       "sample": true
     },
     {
-      "name": "Digital twins for operations",
-      "slug": "digital-twins-for-operations",
-      "quadrant": "Commissioning & Handover",
-      "ring": "Assess",
+      "name": "Project Workbook",
+      "slug": "project-workbook",
+      "quadrant": "Enabling",
+      "ring": "Trial",
       "status": "New",
-      "description": "Connecting the as-built model to live sensor and maintenance data, so clients can run the asset from a digital replica. Worth exploring with clients who have the data maturity.",
+      "description": "BMS 02-08 Reviews sets out how we assure project performance and demonstrate compliance with the standards to which our business is certified. By digitising this process through the Project Workbook in Morta, QES Reviews become more consistent, visible and actionable — bringing health and safety, CDM and environmental considerations together in one trusted place. More than a compliance tool, the workbook turns project information into reusable insight, helping teams learn from previous experience, manage risk earlier and make better-informed decisions.",
       "related": [
-        "COBie asset data handover",
-        "Drone surveys and photogrammetry"
+        "Morta",
       ],
       "history": [
         {
           "date": "2026-11-11",
-          "ring": "Assess",
+          "ring": "Trial",
           "change": "Added"
         }
       ],
