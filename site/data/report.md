@@ -1,34 +1,33 @@
 # About the radar
 
-This is a sample introduction. Replace it with a few paragraphs about why Mott MacDonald Bentley publishes a technology radar, who it is for and how people should use it.
+The Mott MacDonald Bentley Technology Radar provides a shared view of the technologies we use today and those we are exploring for the future. It brings together tools and technologies from across enabling, design, construction, commissioning and handover, helping teams understand what is available, where technologies are being applied and where new opportunities are emerging.
 
-For example: the radar is a snapshot of the technologies our teams use and are exploring across design, construction and handover. It is put together by people from across the business, based on real project experience, and published twice a year.
+The radar is shaped by people from across the business and informed by real project experience. It is intended to encourage knowledge sharing, reduce duplication and help teams make informed technology choices rather than adopting tools in isolation. It is a snapshot rather than a fixed standard, and will evolve as technologies mature, project needs change and we learn more from their application.
 
-Anyone can propose a technology through the **Propose a technology** button on the radar page.
+Use the radar to explore technologies relevant to your work, understand their current level of adoption and identify opportunities to learn from other teams. If you are using, trialling or have identified a technology that could benefit the wider business, you can submit it using the Propose a technology button on the radar page.
 
 # Contributors
 
 The people who reviewed and discussed the blips in this edition.
 
-- Name Surname, Role
-- Name Surname, Role
-- Name Surname, Role
-- Name Surname, Role
-- Name Surname, Role
-- Name Surname, Role
+- Maciej Sulek (author), Digital Delivery Manager
 
 # Themes
 
-A few patterns that came up repeatedly while putting this edition together. Replace these sample themes with your own for each edition.
+A few themes are emerging across this edition of the Technology Radar, reflecting how digital technology is changing the way we design, deliver and hand over projects.
 
-## One source of truth for project information
+## From individual tools to connected delivery
 
-Teams are converging on a single common data environment run to ISO 19650. The gains come less from the tool itself and more from agreeing how information moves from work in progress to published.
+The focus is shifting from adopting individual technologies to connecting them across the project lifecycle. Greater integration between design, information management, construction and asset data can reduce duplication and create a more consistent flow of information from design through to handover.
 
-## Automating the repetitive parts of design
+## Automation becomes part of everyday delivery
 
-Visual programming with Dynamo and Grasshopper is now routine for checks and repetitive modelling. The next step is sharing scripts across teams rather than rebuilding them on each project.
+Automation is moving beyond specialist use cases and into everyday project delivery. Automated checks, data processing, reporting and repeatable design activities are helping teams reduce manual effort, improve consistency and spend more time on higher-value work.
 
-## Handover starts at design
+## AI moving from experimentation to practical use
 
-Clients increasingly expect usable asset data, not boxes of manuals. Structured handover data and early digital twin pilots both depend on capturing the right information from the start.
+AI is increasingly being explored for practical delivery challenges rather than as technology in isolation. The opportunity is to identify repeatable use cases where AI can support people, improve access to information and accelerate existing processes, while maintaining appropriate governance and human oversight.
+
+## Better data creates better handover
+
+Digital handover cannot be solved at the end of a project. Structured, reliable asset information needs to be considered from the start, with information progressively developed and validated through design, construction and commissioning.
