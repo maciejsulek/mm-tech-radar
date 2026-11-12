@@ -3,12 +3,12 @@
   "updated": "2026-11-11",
   "blips": [
     {
-      "name": "Revit",
-      "slug": "revit",
+      "name": "Plant 3D",
+      "slug": "plant-3D",
       "quadrant": "Design",
       "ring": "Adopt",
       "status": "New",
-      "description": "Autodesk Revit is a commercial Building Information Modeling (BIM) software platform developed by [Autodesk](https://www.autodesk.com) for architects, structural engineers, mechanical, electrical, and plumbing (MEP) engineers, and construction professionals.",
+      "description": "AutoCAD Plant 3D is a specialized 3D computer-aided design (CAD) software developed by Autodesk for designing, modeling, and documenting process plants, such as oil and gas facilities, chemical plants, water treatment systems, and food and beverage manufacturing units. It is built directly on the familiar AutoCAD platform and included as part of standard AutoCAD subscriptions.",
       "related": [],
       "history": [
         {
@@ -163,19 +163,17 @@
       "sample": true
     },
     {
-      "name": "Paper-based site diaries",
-      "slug": "paper-based-site-diaries",
+      "name": "Forma Site Design",
+      "slug": "forma-site-design",
       "quadrant": "Construction",
-      "ring": "Caution",
+      "ring": "Trial",
       "status": "No change",
-      "description": "Handwritten diaries and forms are hard to search, share or analyse. Use the digital site forms in the common data environment for new projects.",
-      "related": [
-        "Common data environment (ISO 19650)"
-      ],
+      "description": "Forma Site Design (formerly known as Autodesk Forma and originally developed by Spacemaker) is a cloud-based, AI-powered software platform built for early-stage urban planning, conceptual design, and site analysis.",
+      "related": [],
       "history": [
         {
           "date": "2026-05-04",
-          "ring": "Caution",
+          "ring": "Trial",
           "change": "Added"
         }
       ],
